@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import os
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
 
 
 def get_data():
@@ -27,7 +28,7 @@ def get_data():
             return response_json
     except Exception as e:
         print(f'An error was found while trying to connect to API: {e}')
-        return None
+        raise
 
 def transform_data(data):
     """Expande e transforma os dados do arquivo JSON para um formato tabular(dataframe)"""
@@ -77,6 +78,8 @@ def load_db(df,table_name):
         print(f"The connection has failed: {e}")
 
 
+
+load_dotenv(override=True)
 
 def main():
     print("Extracting data from Open-Meteo API...")
