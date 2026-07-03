@@ -1,0 +1,18 @@
+*.env
+
+# Ignora arquivos JSON pesados
+*.json
+
+# Ignora ambiente virtual
+venv/
+
+notebooks/*.ipynb
+
+
+# Ignorar pastas ocultas do VS Code e do Python
+.vscode/
+__pycache__/
+*.pyc
+
+#Pasta de checkpoints
+.ipynb_checkpoints/
