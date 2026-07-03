@@ -12,9 +12,11 @@ def get_data():
     params = {
 	"latitude": [-23.5489, -22.9035],
 	"longitude": [-46.6388, -43.2096],
-	"hourly": "temperature_2m",
+	"hourly": ["temperature_2m",
+            "relative_humidity_2m","precipitation","apparent_temperature"],
     "timezone": "America/Sao_Paulo",
 	"past_days": 1,
+    "forecast_days": 0
     }
 
     try:
@@ -38,11 +40,14 @@ def transform_data(data):
 
     for i,estado in enumerate(estados):
         date = data[i]["hourly"]["time"]
+        umidity = data[i]["hourly"]["relative_humidity_2m"]
+        precipitation = data[i]["hourly"]["precipitation"]
+        ap_temperature = data[i]["hourly"]["apparent_temperature"]
         temp = data[i]["hourly"]["temperature_2m"]
 
 
         df_temp = pd.DataFrame({"date_time": date,
-        "temperature": temp})
+        "temperature": temp,"umidity": umidity,"precipitation":precipitation,"apparent_temp": ap_temperature})
 
         df_temp["estado"]  = estado
         dfs.append(df_temp)
@@ -50,6 +55,7 @@ def transform_data(data):
     df = pd.concat(dfs, ignore_index=True)
 
     df["date_time"] = pd.to_datetime(df["date_time"],errors="raise")
+    df["hora"] = df["date_time"].dt.hour
     return df
 
 
