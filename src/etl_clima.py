@@ -2,7 +2,7 @@ import json
 import requests
 import pandas as pd
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine,text
 from dotenv import load_dotenv
 
 
@@ -74,15 +74,18 @@ def load_db(df,table_name):
     engine = create_engine(url)
     try:
         print(f"Trying to connect to {database}...")
+        with engine.begin() as conn:
+            df.to_sql(name='temp_staging',con=conn,if_exists='replace',index=False)
 
-        conn = engine.connect()
-        if conn and table_name is not None and not df.empty:
+            conn.execute(text(
+            f"""INSERT INTO {table_name} (date_time,temperature,umidity,precipitation,apparent_temp,estado,hora)
+                SELECT date_time,temperature,umidity,precipitation,apparent_temp,estado,hora
+                FROM temp_staging
+                ON CONFLICT (estado,date_time) DO NOTHING """))
+            
             print(f'The data was inserted in {database} sucessfully!')
-            return df.to_sql(name=table_name,con=engine,if_exists='append',index=False)
-                
     except Exception as e:
         print(f"The connection has failed: {e}")
-
 
 
 load_dotenv(override=True)
