@@ -2,8 +2,21 @@ import json
 import requests
 import pandas as pd
 import os
+import logging
 from sqlalchemy import create_engine,text
 from dotenv import load_dotenv
+
+logging.basicConfig(
+    level = logging.INFO,
+    format= "%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("etl_clima.log"),
+        logging.StreamHandler()
+]
+
+)
+logger = logging.getLogger(__name__)
+
 
 
 def get_data():
@@ -73,7 +86,7 @@ def load_db(df,table_name):
 
     engine = create_engine(url)
     try:
-        print(f"Trying to connect to {database}...")
+        logger.info(f"Trying to connect to {database}...")
         with engine.begin() as conn:
             df.to_sql(name='temp_staging',con=conn,if_exists='replace',index=False)
 
@@ -83,21 +96,25 @@ def load_db(df,table_name):
                 FROM temp_staging
                 ON CONFLICT (estado,date_time) DO NOTHING """))
             
-            print(f'The data was inserted in {database} sucessfully!')
+            logger.info(f'The data was inserted in {database}.')
     except Exception as e:
-        print(f"The connection has failed: {e}")
+        logger.error(f"The connection has failed: {e}")
+        raise
+        
 
 
 load_dotenv(override=True)
 
 def main():
-    print("Extracting data from Open-Meteo API...")
-    dados_brutos = get_data()
-
-    print("Transforming data...")
-    df = transform_data(dados_brutos)
-
-    load_db(df,'open_meteo_data')
+    try:
+        logger.info("Extracting data from Open-Meteo API...")
+        dados_brutos = get_data()
+        logger.info("Transforming data...")
+        df = transform_data(dados_brutos)
+        load_db(df,'open_meteo_data')
+        logger.info("The pipeline has finalized sucessfully!")
+    except Exception as e:
+        logger.critical(f"Pipeline was interrupted:{e}")
 
 main()
 
