@@ -97,5 +97,5 @@ Durante o desenvolvimento, alguns problemas reais de engenharia de dados foram e
  
 - [ ] Automatizar execução diária por meio de uma ferramenta de orquestração
 - [ ] Adicionar logging estruturado (substituir `print` por `logging`)
-- [ ] Construir dashboard de visualização no Power BI
+- [ ] Adicionar carga incremental com constraint no banco de dados
 
