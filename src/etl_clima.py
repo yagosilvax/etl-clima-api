@@ -105,7 +105,7 @@ def load_db(df,table_name):
 
 load_dotenv(override=True)
 
-def main():
+if __name__ == "__main__":
     try:
         logger.info("Extracting data from Open-Meteo API...")
         dados_brutos = get_data()
@@ -116,5 +116,4 @@ def main():
     except Exception as e:
         logger.critical(f"Pipeline was interrupted:{e}")
 
-main()
 
